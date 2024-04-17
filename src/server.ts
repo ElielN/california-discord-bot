@@ -1,11 +1,20 @@
+import fastify from "fastify";
+import { ZodTypeProvider } from "fastify-type-provider-zod";
+import { commandsHandler } from "./commands/commands-handler/commands-handler";
+import { eventsHandler } from "./events/events-handler/events-handler";
+import { Player } from "discord-player";
+
 require('dotenv').config();
 
-const { Client, GatewayIntentBits } = require('discord.js');
+const { Client, Collection, GatewayIntentBits } = require('discord.js');
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+// export const app = fastify().withTypeProvider<ZodTypeProvider>()
+export const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
-client.on('ready', () => {
-    console.log(`Logged in as ${client.user.tag}!`)
-});
+client.commands = new Collection();
+client.player = new Player(client)
 
-client.login(process.env.BOT_TOKEN)
+commandsHandler();
+eventsHandler();
+
+client.login(process.env.BOT_TOKEN);
